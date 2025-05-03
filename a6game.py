@@ -23,6 +23,9 @@ class Game:
     The game also has a takeback feature supported by the method take_back().  This is
     used in AI play to undo speculative moves,
     """
+    
+    
+    
     # HIDDEN ATTRIBUTES
     # Attribute _board: The game board
     # Invariant: _board is a Board object
@@ -45,13 +48,13 @@ class Game:
         """
         Returns the game board
         """
-        pass
+        return self._board
     
     def getPlayers(self):
         """
         Returns a list of players in the game
         """
-        pass
+        return self._players
     
     def addPlayer(self, player):
         """
@@ -64,26 +67,34 @@ class Game:
         Precondition: player is a Player object with a different color than any
         of the current players.
         """
-        pass
+        if is_new_player(self._players,player):
+            self._players.append(player)
+            if self._current==-1:
+                self._current=0
+                
+        
     
     def clearPlayers(self):
         """
         Removes all the players from the game
         """
-        pass
+        self._players=[]
+        self._current=-1
+        
     
     def getCurrent(self):
         """
         Returns the current player object in the game. If there are no players, it
         returns None.
         """
-        pass
-    
+        if self._current==-1:
+            return None
+        return self._players[self._current]
     def getWinner(self):
         """
         Returns the (color of) the winner of the game (or None if there is no winner)
         """
-        pass
+        return self._winner
     
     def __init__(self,width,height,streak):
         """
@@ -101,7 +112,12 @@ class Game:
         Parameter streak: The number of pieces in a line necessary to win
         Precondition: streak is an int > 0 and <= min(width,height)
         """
-        pass
+        self._board=a6board.Board(width,height,streak)
+        self._players=[]
+        self._current=-1
+        self._winner=None
+        
+        
 
     #### PART B ####
     def advance(self):
@@ -111,7 +127,8 @@ class Game:
         This increments the current player index by 1 (or resets it to 0 when 
         all players have had a chance.
         """
-        pass
+        if self._players:
+            self._current=(self._current+1)%len(self._players)
     
     def takeTurn(self,player):
         """
@@ -125,7 +142,12 @@ class Game:
         Parameter player: The current player
         Precondition: player is a Player object
         """
-        pass
+        C=player.chooseMove(self._board)
+        if C !=-1:
+            p=self._board.place(C,player.getColor())
+            if p:
+                return C
+        return -1
     
     def run(self):
         """
@@ -134,7 +156,21 @@ class Game:
         This method contains a while loop that runs until either there is a 
         winner or the game board fills up.
         """
-        pass
+        while not self._winner and not self._board.isFull():
+            current_player=self.getCurrent()
+            move=self.takeTurn (current_player)
+            if move!=-1:
+                if self._board.isWin(current_player.getColor()):
+                    self._winner=current_player.getColor()
+                else:
+                    self.advance()
+            else:
+                return (f"{current_player.getColor()} could not move")
+                    
+                    
+                    
+                    
+                    
 
 
 #### HELPER FUNCTION ####
@@ -154,3 +190,4 @@ def is_new_player(players,p):
         if opponent.getColor() == p.getColor():
             return False
     return True
+
